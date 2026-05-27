@@ -22,8 +22,19 @@ SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NEBQA_SRC="$SRC_DIR/skills/neb-qa"
 NEBQA_DST="$CLAUDE_HOME/skills/neb-qa"
 
-say()  { echo "$*"; }
-run()  { echo "+ $*"; [ "$DRY_RUN" -eq 1 ] || eval "$@"; }
+say() { echo "$*"; }
+
+# run: print then execute (skipped under --dry-run). Array-based, no eval — safe with spaces.
+run() {
+  printf '+'; printf ' %q' "$@"; printf '\n'
+  [ "$DRY_RUN" -eq 1 ] || "$@"
+}
+
+# run_ok: like run, but tolerates a non-zero exit (idempotent steps that may already be done).
+run_ok() {
+  printf '+'; printf ' %q' "$@"; printf '\n'
+  [ "$DRY_RUN" -eq 1 ] || "$@" || true
+}
 
 # 1. Preflight
 if ! command -v claude >/dev/null 2>&1; then
@@ -31,21 +42,27 @@ if ! command -v claude >/dev/null 2>&1; then
   [ "$DRY_RUN" -eq 1 ] || exit 1
 fi
 
-# 2. gstack
+# 2. gstack (skip if already cloned, unless --force)
 if [ -d "$GSTACK_DIR/.git" ] && [ "$FORCE" -eq 0 ]; then
   say "gstack: already installed (use --force to reinstall)"
 else
-  run "git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git \"$GSTACK_DIR\""
-  run "(cd \"$GSTACK_DIR\" && ./setup)"
+  if [ -d "$GSTACK_DIR" ]; then
+    run rm -rf "$GSTACK_DIR"
+  fi
+  run git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git "$GSTACK_DIR"
+  run bash -c 'cd "$1" && ./setup' _ "$GSTACK_DIR"
 fi
 
-# 3. superpowers
-run "claude plugin marketplace add anthropics/claude-plugins-official"
-run "claude plugin install superpowers@claude-plugins-official"
+# 3. superpowers (idempotent; tolerate "already added/installed")
+run_ok claude plugin marketplace add anthropics/claude-plugins-official
+run_ok claude plugin install superpowers@claude-plugins-official
 
-# 4. neb-qa skill
-run "mkdir -p \"$CLAUDE_HOME/skills\""
-run "cp -R \"$NEBQA_SRC\" \"$NEBQA_DST\""
+# 4. neb-qa skill (overwrite cleanly so updates land; avoid nested copy on re-run)
+run mkdir -p "$CLAUDE_HOME/skills"
+if [ -d "$NEBQA_DST" ]; then
+  run rm -rf "$NEBQA_DST"
+fi
+run cp -R "$NEBQA_SRC" "$NEBQA_DST"
 
 # 5. Next steps
 say ""
