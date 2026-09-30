@@ -4,6 +4,12 @@ Team Nebula's shared QA gate for Claude Code. One install gives every teammate
 the same review → tests → security → verify sequence before any merge, invoked
 the same way: `/neb-qa`.
 
+> **Looking for User Acceptance Testing?** That's a separate kit:
+> [rs21-uat-skills](https://github.com/teamnebula-ai/rs21-uat-skills) generates
+> UAT packs from a codebase plus its requirements documents. `/neb-qa` proves a
+> change is safe to merge; `/uat-run` proves the product does what the
+> requirements said it would. Deliberately not vendored here — one copy, no drift.
+
 ## Why
 
 Our favorite QA skills live in three places with different installability —
