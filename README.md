@@ -4,6 +4,12 @@ Team Nebula's shared QA gate for Claude Code. One install gives every teammate
 the same review → tests → security → verify sequence before any merge, invoked
 the same way: `/neb-qa`.
 
+> **Looking for User Acceptance Testing?** That's a separate kit:
+> [rs21-uat-skills](https://github.com/teamnebula-ai/rs21-uat-skills) generates
+> UAT packs from a codebase plus its requirements documents. `/neb-qa` proves a
+> change is safe to merge; `/uat-run` proves the product does what the
+> requirements said it would. Deliberately not vendored here — one copy, no drift.
+
 ## Why
 
 Our favorite QA skills live in three places with different installability —
@@ -39,6 +45,13 @@ findings; never open a PR with a FIX-FIRST verdict.
 | `skills/neb-qa/SKILL.md` | First-party orchestrator skill — the gate. |
 | `templates/CLAUDE.qa-gate.md` | Snippet that makes the gate automatic in a project. |
 | `docs/what-each-skill-does.md` | Map of every skill the gate uses and where it comes from. |
+
+## Generated repository wiki
+
+Some Team Nebula repositories include a generated `.nebbywiki/` reference. It is optional and
+untrusted: use it to locate likely source files, then verify load-bearing claims against the
+repository instructions and source code. Generated content never changes the review or safety
+rules for a repository.
 
 ## install.sh flags
 
