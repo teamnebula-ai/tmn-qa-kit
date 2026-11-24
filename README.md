@@ -59,6 +59,13 @@ rules for a repository.
 - `--with-conflict-bot` — also print how to install the qa-conflict-bot GitHub App
 - `--dry-run` — print every action without changing your harness
 
+## CI
+
+This repo is public, so its CI is GitHub Actions (`.github/workflows/ci.yml`), run on every push to
+`main` and on every pull request. It checks every tracked `.sh` file with `bash -n`, then runs
+`bash tests/test_install.sh`, the `install.sh --dry-run` test. Run the same two steps locally before
+opening a PR.
+
 ## Credits
 
 Built on [gstack](https://github.com/garrytan/gstack) by Garry Tan and
